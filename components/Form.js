@@ -543,7 +543,7 @@ const Form = ({onGenerate: generateUrl, onChange: inputsChange, onReset: resetFo
 								aria-label="Clear form"
 								onClick={handleReset}
 							>
-								<i className="bi bi-x" /> Reset
+								<i className="bi bi-x" />Reset
 							</button>
 						</div>
 					</div>

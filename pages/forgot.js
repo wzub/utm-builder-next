@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Link from "next/link";
-import { auth } from "../firebase-config";
 import { sendPasswordResetEmail } from "firebase/auth";
 import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
@@ -87,12 +86,7 @@ function ForgotPassword() {
 			</div>
 			<div className="w-100 text-center mt-2">
 				<Link href="/signin">
-					<a>Already have an account? Log In</a>
-				</Link>
-			</div>
-			<div className="w-100 text-center mt-2">
-				<Link href="/signup">
-					<a>Don't have an account? Sign up</a>
+					<a>Know your login details? Log In</a>
 				</Link>
 			</div>
 		</Layout>

@@ -3,6 +3,8 @@ import Script from "next/script";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 // import { useAuth } from "../context/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Layout = ({ title, children }) => {
 	return (
@@ -17,7 +19,7 @@ export const Layout = ({ title, children }) => {
 					name="description"
 					content="a simple web app to build UTM links in bulk"
 				/>
-				<title>{title ? title + ' - ' : ''}Bulk UTM Builder</title>
+				<title>{title ? title + " - " : ""}Bulk UTM Builder</title>
 
 				{/* 
 				<!-- CSS only -->
@@ -29,7 +31,21 @@ export const Layout = ({ title, children }) => {
 
 			<Header />
 
-			<div className="content container">{children}</div>
+			<div className="content container-md my-md-3">
+				<ToastContainer
+					position="top-right"
+					autoClose={4000}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick
+					rtl={false}
+					pauseOnFocusLoss
+					draggable
+					pauseOnHover
+				/>
+
+				{children}
+			</div>
 
 			<Footer />
 

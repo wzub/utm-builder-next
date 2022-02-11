@@ -1,6 +1,6 @@
 import React from "react";
 
-const Loading = () => {
+const Spinner = () => {
 	return (
 		<div className="container my-5 text-center">
 			<div className="spinner-grow" role="status">
@@ -10,4 +10,4 @@ const Loading = () => {
 	);
 };
 
-export default Loading;
+export default Spinner;

@@ -1,4 +1,7 @@
 const axios = require("axios");
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { verifyIdToken } from "../../config/firebase-admin-config";
+import { db } from "../../config/firebase-client-config";
 
 /*
 exports.handler = async (event, context) => {
@@ -75,50 +78,70 @@ exports.handler = async (event, context) => {
 };
 */
 
-export default function handler(req, res) {
-
-	const { url } = req.body,
-		urlObj = new URL(url),
-		allowed_urls = [
-			"tcf.org.pk",
-			"tcfusa.org",
-			"tcfcanada.org",
-			"tcf-uk.org",
-			"tcfaustralia.org",
-			"tcfnorway.org",
-			"tcfitalia.org",
-		],
-		config = {
-			token: process.env.BITLY_TOKEN,
-			group_guid: "",
-		},
-		options = {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${config.token}`,
-				"Content-Type": "application/json",
+export default async function handler(req, res) {
+	try {
+		const validatedToken = await verifyIdToken(req.cookies.token),
+			{ url } = req.body,
+			urlObj = new URL(url),
+			allowed_urls = [
+				"tcf.org.pk",
+				"tcfusa.org",
+				"tcfcanada.org",
+				"tcf-uk.org",
+				"tcfaustralia.org",
+				"tcfnorway.org",
+				"tcfitalia.org",
+			],
+			config = {
+				token: process.env.BITLY_TOKEN,
+				group_guid: "",
 			},
-			url: "https://api-ssl.bitly.com/v4/shorten",
-			data: JSON.stringify({
-				long_url: urlObj.toString(),
-				domain: "bit.ly",
-				tags: ["bulk-utm-builder", "api"],
-				group_guid: config.group_guid,
-			}),
-		};
-		// user = await firebaseAdmin.auth().verifySessionCookie(req.cookies.session);
+			options = {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${config.token}`,
+					"Content-Type": "application/json",
+				},
+				url: "https://api-ssl.bitly.com/v4/shorten",
+				data: JSON.stringify({
+					long_url: urlObj.toString(),
+					domain: "bit.ly",
+					tags: ["bulk-utm-builder", "api"],
+					group_guid: config.group_guid,
+				}),
+			};
 
-	// token = context.clientContext?.identity?.token;
+		if (allowed_urls.includes(urlObj.hostname) === false) {
+			res.status(401).send("Disallowed domain");
+			// throw new Error("Disallowed domain");
+		}
 
-	console.log(req.cookies.session);
+		if (validatedToken.sub) {
+			await axios(options)
+				.then((response) => {
 
-	res.status(200).json({
-		statusCode: 200,
-		data: {
-			link: 'shortened link'
-		},
-		headers: {
-			"Content-Type": "application/json",
-		},
-	});
+					addDoc(collection(db, "links"), {
+						created: serverTimestamp(),
+						user: validatedToken.sub,
+						domain: urlObj.host,
+						link: urlObj.toString(),
+						shortlink: response.data.link,
+					});
+
+					res.status(200).json({
+						link: response.data.link,
+					});
+				})
+				.catch((error) => {
+					console.log(error);
+					throw new Error("Couldn't create a short link");
+				});
+		} else {
+			res.status(403).send("Couldn't validate session");
+			// throw new Error("Couldn't validate session");
+		}
+	} catch (error) {
+		console.error(error);
+		res.status(error.status || 500).json(error.message);
+	}
 }

@@ -2,6 +2,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Layout } from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 function UserPage() {
 	const { currentUser, updateprofile, updatepassword } = useAuth();
@@ -11,20 +13,14 @@ function UserPage() {
 	const [editingName, setEditingName] = useState(false);
 	const [editingPassword, setEditingPassword] = useState(false);
 
-	const [formData, setFormData] = useState({
-		name: currentUser.displayName,
-		email: currentUser.email,
-		password: "",
-	});
-
-	const { name, email, password } = formData;
-
 	const handleChange = (e) => {
 		setFormData((prevState) => ({
 			...prevState,
 			[e.target.id]: e.target.value,
 		}));
 	};
+
+	const router = useRouter();
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -63,10 +59,21 @@ function UserPage() {
 		}
 	};
 
-	return (
-		<Layout title="Profile">
+	if (currentUser) {
+		const [formData, setFormData] = useState({
+			name: currentUser.displayName,
+			email: currentUser.email,
+			password: "",
+		});
+
+		const { name, email, password } = formData;
+
+		return (
+			<Layout title="Profile">
 				{error && (
-					<div className={`alert alert-${error.type}`}>{error.message}</div>
+					<div className={`alert alert-${error.type}`}>
+						{error.message}
+					</div>
 				)}
 				<div className="row d-flex justify-content-center align-items-center w-100 py-3">
 					<div className="col-md-6">
@@ -121,13 +128,18 @@ function UserPage() {
 								</div>
 							</div>
 							<div className="mb-3">
-								<label htmlFor="password" className="form-label">
+								<label
+									htmlFor="password"
+									className="form-label"
+								>
 									Password
 								</label>
 								<div className="input-group">
 									<input
 										id="password"
-										type={showPassword ? "text" : "password"}
+										type={
+											showPassword ? "text" : "password"
+										}
 										value={password}
 										onChange={handleChange}
 										className="form-control form-control-lg"
@@ -172,7 +184,8 @@ function UserPage() {
 							<div className="align-items-center">
 								<button
 									disabled={
-										loading || !(editingName || editingPassword)
+										loading ||
+										!(editingName || editingPassword)
 									}
 									type="submit"
 									className="btn btn-primary btn-lg my-3 w-100"
@@ -191,8 +204,13 @@ function UserPage() {
 						</a>
 					</Link>
 				</div>
-		</Layout>
-	);
+			</Layout>
+		);
+	} else {
+		toast.error("Please login");
+		router.push("/signin");
+		return <></>;
+	}
 }
 
 export default UserPage;

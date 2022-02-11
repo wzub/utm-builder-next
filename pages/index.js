@@ -5,8 +5,10 @@ import { ValidationProvider } from "../context/ValidationContext";
 import { useAuth } from "../context/AuthContext";
 import Form from "../components/Form";
 import Table from "../components/Table";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
-const BuildPage = () => {
+const BuildPage = ({ loggedInUser }) => {
 	const blankInputs = {
 		url: "",
 		utm_source: "",
@@ -23,6 +25,8 @@ const BuildPage = () => {
 	const [validation, setValidation] = useState([]);
 	const [formChanged, setFormChanged] = useState(false);
 	const { currentUser } = useAuth();
+
+	const router = useRouter();
 
 	// handle state of form inputs
 	const inputsChange = (e) => {
@@ -48,6 +52,8 @@ const BuildPage = () => {
 				selected_sites = formData.selected_sites,
 				utms = {},
 				generated_links = {};
+
+			// @TODO: clear short link when long URL changes
 
 			// make url a URL obj
 			url = new URL(url);
@@ -186,56 +192,63 @@ const BuildPage = () => {
 	};
 
 	const makeShortUrl = async (e) => {
+		const button = e.currentTarget,
+			button_icon = e.currentTarget.querySelector("i"),
+			button_text = e.currentTarget.querySelector("span"),
+			shortlink_for = button.dataset.for,
+			url_display = document.querySelector(
+				`pre#${shortlink_for} > code`
+			),
+			shorturl_display = document.querySelector(
+				`pre#${shortlink_for}_shortlink code`
+			),
+			options = {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+					"Content-Type": "application/json",
+				},
+				url: "/api/shorten",
+				data: JSON.stringify({
+					url: url_display.textContent,
+				}),
+			};
+
+		button_icon.classList.add("spinner-border", "spinner-border-sm");
+		button_icon.classList.remove("bi-lightning-charge-fill");
+		button_text.textContent = "Making...";
+
 		try {
-			if (!currentUser.accessToken) throw new ReferenceError("Login");
-
-			const button = e.currentTarget,
-				// button_icon = e.currentTarget.querySelector("i"),
-				button_text = e.currentTarget.querySelector("span"),
-				shortlink_for = button.dataset.for,
-				url_display = document.querySelector(
-					`pre#${shortlink_for} > code`
-				),
-				shorturl_display = document.querySelector(
-					`pre#${shortlink_for}_shortlink code`
-				),
-				options = {
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${currentUser.accessToken}`,
-						"Content-Type": "application/json",
-					},
-					url: "/api/shorten",
-					data: JSON.stringify({
-						url: url_display.textContent,
-					}),
-				};
-
-			// button_icon.classList.add("spinner-border", "spinner-border-sm");
-			// button_icon.classList.remove("bi-lightning-charge-fill");
-			button_text.textContent = "Making...";
+			if (!currentUser.accessToken) {
+				// toast.error("Authentication error")
+				throw new Error("Authentication error");
+			}
 
 			await axios(options)
 				.then((response) => {
+					// console.log(response);
+
 					if (response.status === 200) {
 						button_text.textContent = "Make";
-						shorturl_display.textContent = response.data;
-					} else {
-						button_text.textContent = "Retry";
-						return Promise.reject(response.status);
+						shorturl_display.textContent = response.data.link;
 					}
 				})
 				.catch((error) => {
 					button_text.textContent = "Retry";
-					console.log("error", error);
+					toast.error(error.response.data);
 				});
+
+			button_icon.classList.remove("spinner-border", "spinner-border-sm");
+			button_icon.classList.add("bi-lightning-charge-fill");
 		} catch (error) {
+			toast.error("Sorry, something went wrong");
 			console.log(error);
 		}
 	};
 
-	return (
-		<Layout title="">
+	if (currentUser) {
+		return (
+			<Layout title="">
 				<Form
 					inputs={inputs}
 					onChange={inputsChange}
@@ -314,8 +327,13 @@ const BuildPage = () => {
 						</div>
 					</div>
 				</div>
-		</Layout>
-	);
+			</Layout>
+		);
+	} else {
+		toast.error("Please login");
+		router.push("/signin");
+		return <></>;
+	}
 };
 
 export default BuildPage;

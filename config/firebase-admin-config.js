@@ -1,8 +1,7 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("secrets.json");
+const serviceAccount = require("./firebase-secrets.json");
 
-export const verifyIdToken = (token) => {
-
+export const verifyIdToken = async (token) => {
 	if (!admin.apps.length) {
 		admin.initializeApp({
 			credential: admin.credential.cert(serviceAccount),
@@ -15,4 +14,4 @@ export const verifyIdToken = (token) => {
 		.catch((error) => {
 			throw error;
 		});
-}
+};

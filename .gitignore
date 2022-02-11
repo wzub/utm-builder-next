@@ -37,4 +37,4 @@ yarn-error.log*
 .vercel
 
 .vscode
-/config/secrets.json
+/config/firebase-secrets.json
