@@ -1,10 +1,15 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("./firebase-secrets.json");
 
 export const verifyIdToken = async (token) => {
 	if (!admin.apps.length) {
 		admin.initializeApp({
-			credential: admin.credential.cert(serviceAccount),
+			credential: admin.credential.cert({
+				client_email: process.env.FIREBASE_CLIENT_EMAIL,
+				privateKey: process.env.FIREBASE_PRIVATE_KEY
+					? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/gm, "\n")
+					: undefined,
+				project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+			}),
 		});
 	}
 
