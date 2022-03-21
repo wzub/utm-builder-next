@@ -1,7 +1,6 @@
 const axios = require("axios");
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { verifyIdToken } from "../../config/firebase-admin-config";
-import { db } from "../../config/firebase-client-config";
+import { verifyIdToken } from "../../lib/firebase-admin";
+import { saveLink } from "../../lib/db";
 
 /*
 exports.handler = async (event, context) => {
@@ -116,20 +115,23 @@ export default async function handler(req, res) {
 			// throw new Error("Disallowed domain");
 		}
 
+		// create bitly using country specific domains
+		if (urlObj.hostname === "tcf.org.pk") {
+			options.data.domain = "link.tcf.org.pk"
+		}
+
 		if (validatedToken.sub) {
 			await axios(options)
 				.then((response) => {
-
-					addDoc(collection(db, "links"), {
-						created: serverTimestamp(),
-						user: validatedToken.sub,
+					// save to db
+					saveLink(validatedToken.sub, {
 						domain: urlObj.host,
 						link: urlObj.toString(),
 						shortlink: response.data.link,
 					});
 
 					res.status(200).json({
-						link: response.data.link,
+						shortlink: response.data.link,
 					});
 				})
 				.catch((error) => {
