@@ -1,6 +1,6 @@
 const axios = require("axios");
 import { verifyIdToken } from "../../lib/firebase-admin";
-import { saveLink } from "../../lib/db";
+import { saveLink, getSites } from "../../lib/db";
 
 export default async function handler(req, res) {
 	try {
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 			},
 			shortlinkDomain = () => {
 				// create bitly using country specific domains
-				if (urlObj.hostname === "tcf.org.pk") {
+				if (process.env.NODE_ENV != "development" && urlObj.hostname === "tcf.org.pk") {
 					return "link.tcf.org.pk";
 				}
 				else return "bit.ly";
@@ -42,10 +42,12 @@ export default async function handler(req, res) {
 				}),
 			};
 
+		/*
 		if (allowed_urls.includes(urlObj.hostname) === false) {
-			res.status(401).send("Disallowed domain");
+			res.status(401).json("Disallowed domain");
 			// throw new Error("Disallowed domain");
 		}
+		*/
 
 		if (validatedToken.sub) {
 			await axios(options)
