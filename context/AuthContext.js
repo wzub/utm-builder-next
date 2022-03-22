@@ -8,7 +8,7 @@ import {
 	updatePassword,
 	onIdTokenChanged,
 } from "firebase/auth";
-import { auth, db } from "../config/firebase-client-config";
+import { auth, db } from "../lib/firebase";
 import { setDoc, doc, serverTimestamp } from "firebase/firestore";
 import nookies from "nookies";
 import Spinner from "../components/Spinner";
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
 				nookies.set(undefined, "token", token, {
 					path: "/",
 					secure: process.env.NODE_ENV !== "development",
-					sameSite: "strict",
+					sameSite: "Strict",
 				});
 				setCurrentUser(user);
 				setLoggedIn(true);

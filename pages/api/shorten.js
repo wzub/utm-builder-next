@@ -2,81 +2,6 @@ const axios = require("axios");
 import { verifyIdToken } from "../../lib/firebase-admin";
 import { saveLink } from "../../lib/db";
 
-/*
-exports.handler = async (event, context) => {
-	console.log("context", context);
-
-	// @TODO: only proceed if valid firebase accessToken
-
-	const { url } = JSON.parse(event.body),
-		urlObj = new URL(url),
-		allowed_urls = [
-			"tcf.org.pk",
-			"tcfusa.org",
-			"tcfcanada.org",
-			"tcf-uk.org",
-			"tcfaustralia.org",
-			"tcfnorway.org",
-			"tcfitalia.org",
-		],
-		config = {
-			token: process.env.BITLY_TOKEN,
-			group_guid: "",
-		},
-		options = {
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${config.token}`,
-				"Content-Type": "application/json",
-			},
-			url: "https://api-ssl.bitly.com/v4/shorten",
-			data: JSON.stringify({
-				long_url: urlObj.toString(),
-				domain: "bit.ly",
-				tags: ["bulk-utm-builder", "api"],
-				group_guid: config.group_guid,
-			}),
-		},
-		token = context.clientContext?.identity?.token;
-
-	if (allowed_urls.includes(urlObj.hostname) === false) {
-		return {
-			statusCode: 401,
-			body: JSON.stringify('Disallowed domain')
-		  }
-	}
-
-	if (token) {
-		return await axios(options)
-			.then((response) => {
-				return {
-					statusCode: 200,
-					body: JSON.stringify(response.data.link),
-					headers: {
-						"Content-Type": "application/json",
-					},
-				};
-			})
-			.catch((error) => {
-				// console.log(error);
-				return {
-					statusCode: error.response.status,
-					body: `Error ${error.response.status}: ${error.response.statusText}`,
-					headers: {
-						"Content-Type": "application/json",
-					},
-				};
-			});
-	}
-	else {
-		return {
-			statusCode: 401,
-			body: JSON.stringify('Unauthorised')
-		  }
-	}
-};
-*/
-
 export default async function handler(req, res) {
 	try {
 		const validatedToken = await verifyIdToken(req.cookies.token),
@@ -95,6 +20,13 @@ export default async function handler(req, res) {
 				token: process.env.BITLY_TOKEN,
 				group_guid: "",
 			},
+			shortlinkDomain = () => {
+				// create bitly using country specific domains
+				if (urlObj.hostname === "tcf.org.pk") {
+					return "link.tcf.org.pk";
+				}
+				else return "bit.ly";
+			},
 			options = {
 				method: "POST",
 				headers: {
@@ -104,7 +36,7 @@ export default async function handler(req, res) {
 				url: "https://api-ssl.bitly.com/v4/shorten",
 				data: JSON.stringify({
 					long_url: urlObj.toString(),
-					domain: "bit.ly",
+					domain: shortlinkDomain(),
 					tags: ["bulk-utm-builder", "api"],
 					group_guid: config.group_guid,
 				}),
@@ -113,11 +45,6 @@ export default async function handler(req, res) {
 		if (allowed_urls.includes(urlObj.hostname) === false) {
 			res.status(401).send("Disallowed domain");
 			// throw new Error("Disallowed domain");
-		}
-
-		// create bitly using country specific domains
-		if (urlObj.hostname === "tcf.org.pk") {
-			options.data.domain = "link.tcf.org.pk"
 		}
 
 		if (validatedToken.sub) {

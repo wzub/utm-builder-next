@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import SitesList from "./SitesList";
 
 const Form = ({onGenerate: generateUrl, onChange: inputsChange, onReset: resetForm, inputs}) => {
 
@@ -58,7 +59,7 @@ const Form = ({onGenerate: generateUrl, onChange: inputsChange, onReset: resetFo
 			selected_sources["utm_facebook"] = {
 				utm_medium: 'social',
 				utm_source: 'facebook',
-				icon: '<bi-facebook>',
+				icon: 'bi-facebook',
 				...selected_sources["utm_facebook"]
 			};
 		}
@@ -220,73 +221,7 @@ const Form = ({onGenerate: generateUrl, onChange: inputsChange, onReset: resetFo
 						</div>
 					</div>
 					<div className="row">
-						<div
-							className="selected_sites col-md-9 offset-md-3"
-							role="group"
-							aria-label="Sites"
-						>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_pk"
-								value="https://tcf.org.pk"
-								defaultChecked
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_pk">
-								tcf.org.pk
-							</label>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_uk"
-								value="https://tcf-uk.org"
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_uk">
-								tcf-uk.org
-							</label>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_us"
-								value="https://tcfusa.org"
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_us">
-								tcfusa.org
-							</label>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_ca"
-								value="https://tcfcanada.org"
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_ca">
-								tcfcanada.org
-							</label>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_au"
-								value="https://tcfaustralia.org"
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_au">
-								tcfaustralia.org
-							</label>
-							<input
-								type="checkbox"
-								className="btn-check sites"
-								id="site_no"
-								value="https://tcfnorway.org"
-							/>
-							<label className="btn btn-outline-primary" htmlFor="site_no">
-								tcfnorway.org
-							</label>
-							<div className="row">
-								<small className="text-muted form-text">
-									Select the sites for which you want to generate
-									UTM parameters
-								</small>
-							</div>
-						</div>
+						<SitesList />
 					</div>
 				</div>
 				<hr className="my-4" />
@@ -307,7 +242,7 @@ const Form = ({onGenerate: generateUrl, onChange: inputsChange, onReset: resetFo
 							/>
 							<small className="text-muted form-text">
 								A cross-channel description of the campaign or
-								marketing initiative: (e.g. <code>ramzan2021</code>, <code>members</code>, <code>expiry</code>)
+								marketing initiative: (e.g. <code>ramadan2022</code>, <code>members</code>, <code>expiry</code>)
 							</small>
 						</div>
 					</div>

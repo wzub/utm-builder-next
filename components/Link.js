@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 
 // prettier-ignore
 const Link = ({onShorten: makeShortUrl, link, validation}) => {
@@ -10,15 +11,7 @@ const Link = ({onShorten: makeShortUrl, link, validation}) => {
 		navigator.clipboard
 			.writeText(url_container.textContent)
 			.then(() => {
-				btn_text.textContent = "Copied!";
-				// btn_icon.classList.replace("bi-clipboard-plus", "bi-clipboard-check");
-				
-				setTimeout(() => {
-					btn_text.textContent = "Copy";
-					// btn_icon.classList.replace("bi-clipboard-check", "bi-clipboard-plus");
-				}, 1000);
-
-				console.log(`Copied ${url_container.textContent}`);
+				toast.info("Copied", {autoClose:600});
 			})
 			.catch((err) => {
 				console.log("Couldn't copy", err);

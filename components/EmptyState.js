@@ -15,7 +15,7 @@ const EmptyState = () => {
 				id="default_notice"
 				className="text-center text-black-50 mt-md-3"
 			>
-				Click Generate to build some URLs.
+				Generate some links to see them here
 			</p>
 		</div>
 	);

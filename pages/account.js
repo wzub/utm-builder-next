@@ -12,6 +12,11 @@ function UserPage() {
 	const [error, setError] = useState(null);
 	const [editingName, setEditingName] = useState(false);
 	const [editingPassword, setEditingPassword] = useState(false);
+	const [formData, setFormData] = useState({
+		name: "",
+		email: "",
+		password: "",
+	});
 
 	const handleChange = (e) => {
 		setFormData((prevState) => ({

@@ -91,9 +91,11 @@ const Header = () => {
 											</Link>
 										</li>
 										<li>
-											<a className="dropdown-item text-secondary text-decoration-line-through">
-												Settings
-											</a>
+											<Link href="/settings">
+												<a className="dropdown-item">
+													Settings
+												</a>
+											</Link>
 										</li>
 										<li>
 											<hr className="dropdown-divider" />

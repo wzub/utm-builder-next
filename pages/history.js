@@ -34,15 +34,12 @@ function HistoryPage() {
 			return (
 				<Layout title="Shortlink Log">
 					<div className="row d-flex justify-content-center align-items-center w-100 py-3">
-						<div className="col-md-6">
-							<div className="row">
-								<h2 className="text-center mb-3">Link Log</h2>
-								<hr className="mb-3" />
-							</div>
-						</div>
+						<h2 className="text-center mb-3">Link Log</h2>
+						<hr className="mb-3" />
+						<p className="text-center">This is a log of all the shortlinks you have created using this app.</p>
 					</div>
 
-					<HistoryTable data={data.links} />
+					<HistoryTable data={data.userLinks} />
 
 				</Layout>
 			);

@@ -34,13 +34,12 @@ export const Layout = ({ title, children }) => {
 			<div className="content container-md my-md-3">
 				<ToastContainer
 					position="top-right"
-					autoClose={4000}
+					autoClose={3000}
 					hideProgressBar={false}
 					newestOnTop={false}
 					closeOnClick
 					rtl={false}
 					pauseOnFocusLoss
-					draggable
 					pauseOnHover
 				/>
 

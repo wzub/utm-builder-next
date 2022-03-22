@@ -7,6 +7,7 @@ import {
 	usePagination,
 } from "react-table";
 import { format, toDate, formatDistanceToNow } from "date-fns";
+import { toast } from "react-toastify";
 
 function DefaultColumnFilter({
 	column: { filterValue, preFilteredRows, setFilter },
@@ -123,6 +124,21 @@ function Table({ columns, data }) {
 
 			<div className="row justify-content-center">
 				<div className="col-auto me-auto">
+					<select
+						className="form-control form-select"
+						value={pageSize}
+						onChange={(e) => {
+							setPageSize(Number(e.target.value));
+						}}
+					>
+						{[2, 5, 10, 50].map((pageSize) => (
+							<option key={pageSize} value={pageSize}>
+								Show {pageSize}
+							</option>
+						))}
+					</select>
+				</div>
+				<div className="col-auto ">
 					<nav aria-label="Pagination">
 						<ul className="pagination">
 							<li
@@ -154,22 +170,6 @@ function Table({ columns, data }) {
 							</li>
 						</ul>
 					</nav>
-				</div>
-
-				<div className="col-auto">
-					<select
-						className="form-control form-select"
-						value={pageSize}
-						onChange={(e) => {
-							setPageSize(Number(e.target.value));
-						}}
-					>
-						{[2, 5, 10, 50].map((pageSize) => (
-							<option key={pageSize} value={pageSize}>
-								Show {pageSize}
-							</option>
-						))}
-					</select>
 				</div>
 			</div>
 		</div>
@@ -205,10 +205,60 @@ function HistoryTable({ data }) {
 					{
 						Header: "Full link",
 						accessor: "link",
+						Cell: (props) => {
+							return (
+								<>
+									<a
+										id={`${props.cell.row.original.id}`}
+										href={props.value}
+										target="_blank"
+										className="me-2"
+									>
+										{props.value}
+									</a>
+									<a
+										href="#"
+										onClick={(e) => {
+											navigator.clipboard.writeText(
+											 document.getElementById(e.target.dataset.for)
+											);
+											toast.info("Copied", {autoClose:600});
+										}}
+										data-for={`${props.cell.row.original.id}`}
+										className="badge bg-light text-dark text-decoration-none"
+									>Copy</a>
+								</>
+							);
+						},
 					},
 					{
 						Header: "Short link",
 						accessor: "shortlink",
+						Cell: (props) => {
+							return (
+								<>
+									<a
+										id={`${props.cell.row.original.id}_shortlink`}
+										href={props.value}
+										target="_blank"
+										className="me-2"
+									>
+										{props.value}
+									</a>
+									<a
+										href="#"
+										onClick={(e) => {
+											navigator.clipboard.writeText(
+											 document.getElementById(e.target.dataset.for)
+											);
+											toast.info("Copied", {autoClose:600});
+										}}
+										data-for={`${props.cell.row.original.id}_shortlink`}
+										className="badge bg-light text-dark text-decoration-none"
+									>Copy</a>
+								</>
+							);
+						},
 					},
 				],
 			},

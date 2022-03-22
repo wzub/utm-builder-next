@@ -1,33 +1,24 @@
-import { collection, orderBy, query, where, getDocs } from "firebase/firestore";
-import { verifyIdToken } from "../../config/firebase-admin-config";
-import { db } from "../../config/firebase-client-config";
+import { verifyIdToken } from "../../lib/firebase-admin";
+import { getUserLinks } from "../../lib/db";
 
 export default async function handler(req, res) {
 	try {
 		const validatedToken = await verifyIdToken(req.cookies.token);
 
-		const q = query(
-			collection(db, "links"),
-			where("user", "==", validatedToken.sub),
-			orderBy("created", "desc")
-		);
+		if (validatedToken.sub) {
+			const userLinks = await getUserLinks(validatedToken.sub);
 
-		const querySnap = await getDocs(q);
-		let links = [];
-
-		if (querySnap) {
-			querySnap.forEach((doc) => {
-				links.push({ id: doc.id, ...doc.data() });
-			});
-
-			res.status(200).json({links})
+			if (userLinks) {
+				res.status(200).json({ userLinks });
+			} else {
+				res.status(500).json("Couldn't fetch links");
+			}
 		}
 		else {
-			// doc.data() will be undefined in this case
-			console.log("Couldn't find links from this user");
+			res.status(403).json("Authorization error");
 		}
 	} catch (error) {
-		console.error("firebase admin error", error);
+		console.error("link fetch error", error);
 		res.status(error.status || 500).json(error.message);
 	}
 }
