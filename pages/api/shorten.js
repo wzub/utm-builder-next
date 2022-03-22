@@ -22,10 +22,13 @@ export default async function handler(req, res) {
 			},
 			shortlinkDomain = () => {
 				// create bitly using country specific domains
-				if (process.env.NODE_ENV != "development" && urlObj.hostname === "tcf.org.pk") {
+				if (
+					process.env.NODE_ENV != "development" &&
+					(urlObj.hostname === "tcf.org.pk" ||
+						urlObj.hostname === "www.tcf.org.pk")
+				) {
 					return "link.tcf.org.pk";
-				}
-				else return "bit.ly";
+				} else return "bit.ly";
 			},
 			options = {
 				method: "POST",
